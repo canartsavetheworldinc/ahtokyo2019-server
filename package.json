@@ -5,14 +5,15 @@
   "version": "0.1.1",
   "private": false,
   "engines": {
-    "node": "6.*"
+    "node": "10.*"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "debug": "nodemon server.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/IBM-Cloud/get-started-node"
+    "url": "https://github.com/canartsavetheworldinc/ahtokyo2019-server"
   },
   "dependencies": {
     "@cloudant/cloudant": "^3.0.2",
@@ -20,8 +21,12 @@
     "cfenv": "^1.0.x",
     "dotenv": "^4.0.0",
     "express": "^4.15.x",
+    "ibm_db": "^2.5.2",
     "mongodb": "^3.0.10"
   },
   "author": "IBM Corp",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  }
 }
