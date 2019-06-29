@@ -53,7 +53,7 @@ app.post("/survivors", async (req, res) => {
 			})
 		}
 	}
-	
+
 	res.send(responseObj)
 })
 
@@ -81,6 +81,25 @@ app.get("/check", async (req, res) => {
 		responseObj.result = false
 	} else {
 		responseObj.result = true
+	}
+	res.send(responseObj)
+})
+
+app.get("/generate", async (req, res) => {
+	const responseObj = {
+		status: "success"
+	}
+	while(true) {
+		const id = ("000000" + Math.floor(Math.random() * 78364164096).toString(36)).slice(-7)
+		const dbData = await db(`SELECT id FROM survivor WHERE id = '${id}'`).catch(err => {
+			responseObj.status = "failed"
+			responseObj.error = "Could not access DB."
+			res.status(500).send(responseObj)
+		})
+		if(dbData.length === 0) {
+			responseObj.id = id
+			break
+		}
 	}
 	res.send(responseObj)
 })
