@@ -1,0 +1,5 @@
+---
+applications:
+ - name: ahtokyo2019
+   random-route: true
+   memory: 256M
