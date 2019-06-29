@@ -3,6 +3,8 @@ const app = express()
 
 const db = require("./utils/db")
 
+const regex_base36_validation = /^[a-zA-Z0-9]+$/
+
 app.get("/", (req, res) => {
 	res.send("Hello. This is Orion API server.")
 })
@@ -52,6 +54,34 @@ app.post("/survivors", async (req, res) => {
 		}
 	}
 	
+	res.send(responseObj)
+})
+
+app.get("/check", async (req, res) => {
+	const responseObj = {
+		status: "success"
+	}
+	const id = req.query.id
+	if(id.length !== 7) {
+		responseObj.status = "failed"
+		responseObj.error = "ID must have 7 digits."
+		res.status(400).send(responseObj)
+	}
+	if(!id.match(regex_base36_validation)) {
+		responseObj.status = "failed"
+		responseObj.error = "ID must be a Base36-string."
+		res.status(400).send(responseObj)
+	}
+	const dbData = await db(`SELECT id FROM survivor WHERE id = '${id}'`).catch(err => {
+		responseObj.status = "failed"
+		responseObj.error = "Could not access DB."
+		res.status(500).send(responseObj)
+	})
+	if(dbData.length > 0) {
+		responseObj.result = false
+	} else {
+		responseObj.result = true
+	}
 	res.send(responseObj)
 })
 
