@@ -2,7 +2,6 @@ const express = require("express")
 const app = express()
 
 const db = require("./utils/db")
-const compare = require("./utils/compare")
 
 app.get("/", (req, res) => {
 	res.send("Hello. This is Orion API server.")
@@ -56,4 +55,5 @@ app.post("/survivors", async (req, res) => {
 	res.send(responseObj)
 })
 
-app.listen(80)
+const port = process.env.PORT || 3000
+app.listen(port, () => console.log(`Server is listening on port ${port}.`))
