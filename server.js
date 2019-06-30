@@ -1,9 +1,20 @@
 const express = require("express")
+const bodyParser = require("body-parser")
+
 const app = express()
+
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 const db = require("./utils/db")
 
 const regex_base36_validation = /^[a-zA-Z0-9]+$/
+
+app.use((req, res, next) => {
+	res.header("Access-Control-Allow-Origin", "*")
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+	next()
+})
 
 app.get("/", (req, res) => {
 	res.send("Hello. This is Orion API server.")
@@ -24,7 +35,7 @@ app.post("/survivors", async (req, res) => {
 	const responseObj = {
 		status: "success"
 	}
-	if(!(req instanceof Array)) {
+	if(!(req.body instanceof Array)) {
 		responseObj.status = "failed"
 		responseObj.error = "Request must be an array."
 		res.status(400).send(responseObj)
@@ -34,16 +45,17 @@ app.post("/survivors", async (req, res) => {
 		responseObj.error = "Could not access DB."
 		res.status(500).send(responseObj)
 	})
-	for(const survivor of req) {
+	for(const survivor of req.body) {
 		const same = dbData.filter(v => v.id === survivor.id)
-		if(same.length > 0) {
+		
+		if(same.length === 0) {
 			await db(`INSERT INTO survivor VALUES ('${survivor.id || NULL}', ${survivor.time || "NULL"}, ${survivor.lat || "NULL"}, ${survivor.lon || "NULL"})`).catch(err => {
 				// responseObj.status = "failed"
 				// responseObj.error = "Failed to insert."
 				// res.status(400).send(responseObj)
 			})
 		} else {
-			const newest = same.reduce((p, c) => p.time > c.time ? p : c)
+			const newest = same.reduce((p, c) => p.time > c.time ? p : c, {})
 			if(survivor.time < newest.time)
 				continue
 			await db(`UPDATE survivor SET time = ${survivor.time || "NULL"}, latitude = ${survivor.lat || "NULL"}, longitude = ${survivor.lon || "NULL"} WHERE id = '${survivor.id}'`).catch(err => {
